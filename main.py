@@ -45,6 +45,13 @@ def main():
     # Only the file itself gets its mode set: /output is owned by
     # another user on the grader, so touching the directory would fail.
     os.chmod(out_path, 0o644)
+    # Read the file back and make sure what landed is exactly the
+    # message we validated, so a partial or mangled write fails loudly
+    # here instead of silently reaching the judge.
+    with open(out_path, "r", encoding="utf-8") as handle:
+        written = handle.read()
+    if written != text:
+        raise ValueError("written entry does not match the message")
     print("wrote %d characters to %s" % (len(text), out_path))
     return 0
 
